@@ -1,89 +1,73 @@
-const wordsList = [
-    "Forever", "Love", "Fight", "Always", "Trust", "Eternity", 
-    "Together", "Destiny", "Soulmate", "Passion", "Adore", "Cherish", 
-    "Endless", "Promise", "Beautiful", "Us", "Devotion", "Happiness", 
-    "Romance", "Care", "Mine", "Heart", "Journey"
-];
-
-// Generate 60 words for a dense heart shape
-const words = [];
-for (let i = 0; i < 60; i++) {
-    words.push(wordsList[i % wordsList.length]);
-}
-
-const container = document.getElementById('heart-container');
+const wordsList = ["Forever", "Love", "Fight", "Always", "Trust", "Eternity", "Together", "Destiny", "Zinia", "Cherish", "Promise", "Mine"];
+const totalWords = 60; // Total words to make a solid heart outline
+const container = document.getElementById('word-container');
 const elements = [];
 
-// Step 1: Spawn words randomly off-screen or scattered
-words.forEach((word) => {
+// Step 1: Create the words at the exact center of the screen
+for (let i = 0; i < totalWords; i++) {
     const el = document.createElement('div');
     el.className = 'word';
-    el.innerText = word;
+    el.innerText = wordsList[i % wordsList.length];
     
-    // Start at completely random positions and rotations
-    el.style.left = (Math.random() * window.innerWidth) + 'px';
-    el.style.top = (Math.random() * window.innerHeight) + 'px';
-    el.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 720 - 360}deg) scale(0.1)`;
-    
-    // Random shades of pink/red/white
-    const colors = ['#ff69b4', '#ff1493', '#fff0f5', '#ffb6c1'];
-    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    // Start at 50% (center of the container)
+    el.style.left = '50%';
+    el.style.top = '50%';
     
     container.appendChild(el);
     elements.push(el);
-});
+}
 
-// Step 2: Assemble them into a heart shape
+// Step 2: Explode them outward randomly
 setTimeout(() => {
-    const centerX = window.innerWidth / 2;
-    const centerY = window.innerHeight / 2;
-    // Scale heart size based on screen width/height
-    const scale = Math.min(window.innerWidth, window.innerHeight) / 45;
+    elements.forEach(el => {
+        el.style.opacity = '1';
+        el.style.left = `${Math.random() * 100}%`;
+        el.style.top = `${Math.random() * 100}%`;
+        el.style.transform = `translate(-50%, -50%) scale(${Math.random() + 0.5})`;
+    });
+}, 100);
 
+// Step 3: Math perfectly moves them into a heart shape using percentages
+setTimeout(() => {
     elements.forEach((el, i) => {
-        // Parametric equation for a heart
-        const t = (i / elements.length) * Math.PI * 2;
+        const t = (i / totalWords) * Math.PI * 2;
+        // Mathematical equation for a heart
         const x = 16 * Math.pow(Math.sin(t), 3);
         const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
 
-        // Move to heart coordinates and spin into place
-        el.style.left = (centerX + x * scale) + 'px';
-        el.style.top = (centerY + y * scale) + 'px';
-        el.style.opacity = '1';
-        el.style.transform = `translate(-50%, -50%) rotate(360deg) scale(1)`;
+        // Multiply by 2.5 to scale it, add 50 to center it in the 0-100% grid
+        el.style.left = `${50 + (x * 2.5)}%`;
+        el.style.top = `${50 + (y * 2.5)}%`;
+        el.style.transform = `translate(-50%, -50%) scale(1)`;
     });
-}, 500);
+}, 2500);
 
-// Step 3: Spin the entire assembled heart
+// Step 4: Spin the whole heart
 setTimeout(() => {
-    container.classList.add('spin-heart');
-}, 3500);
+    // Add 360deg rotation to the existing translate to keep it centered
+    container.style.transform = 'translate(-50%, -50%) rotate(360deg)';
+}, 5000);
 
-// Step 4: Dim the heart, show the dialog, and start the typewriter
+// Step 5: Dim the heart, reveal the centered box, and type the message
 setTimeout(() => {
-    // Make the heart fade slightly into the background
-    elements.forEach(el => el.style.opacity = '0.15');
+    container.style.opacity = '0.2'; // Dim the background heart
+    const dialogBox = document.getElementById('dialog-box');
+    dialogBox.classList.add('show');
     
-    const dialog = document.getElementById('dialog-box');
-    dialog.style.display = 'block';
-    
-    // Small delay to allow display:block to register before opacity transition
-    setTimeout(() => {
-        dialog.classList.remove('hidden');
-        typeWriter();
-    }, 50);
-}, 6500);
+    // Start typing slightly after the box appears
+    setTimeout(typeWriter, 1000);
+}, 7500);
 
-// The Typewriter Logic
-const message = "Dear Zinia,\n\nFrom the moment you walked into my life, everything made sense. I want to fight for us, love you forever, and cherish every single day together.\n\nWill you be mine?";
+// Typewriter logic
+const message = "Dear Zinia,\n\nI want to fight for us, love you forever, and cherish every single day together.\n\nWill you be mine?";
 let charIndex = 0;
 
 function typeWriter() {
     if (charIndex < message.length) {
         const char = message.charAt(charIndex);
-        const textContainer = document.getElementById('typewriter-text');
+        const textContainer = document.getElementById('typewriter');
         
-        // Handle line breaks
+        // Convert newlines to HTML breaks
         if (char === '\n') {
             textContainer.innerHTML += '<br>';
         } else {
@@ -91,9 +75,6 @@ function typeWriter() {
         }
         
         charIndex++;
-        
-        // Slight randomization in typing speed for realism (between 40ms and 90ms)
-        const typeSpeed = Math.random() * 50 + 40;
-        setTimeout(typeWriter, typeSpeed);
+        setTimeout(typeWriter, 60); // Speed of typing
     }
 }
